@@ -1,0 +1,10 @@
+// .sequelizerc
+
+const path = require('path');
+
+module.exports = {
+	config: path.resolve('./src/database/postgresql/config', 'config.json'),
+	'migrations-path': path.resolve('./src/database/postgresql/migrations', 'migrations'),
+	'models-path': path.resolve('./src/database/postgresql/models', 'models'),
+	'seeders-path': path.resolve('./src/database/postgresql/seeders', 'seeders'),
+};
