@@ -1,37 +1,17 @@
-export default function connection(mongoose, connectionString, options) {
-	function useMongoDb() {
-		mongoose
-			.connect(connectionString, options)
-			.then(
-				() => {},
-				(err) => {
-					console.info('Mongo error: ', err);
-				}
-			)
-			.catch((err) => {
-				console.log('ERROR: ', err);
-			});
-	}
+const mongoose = require('mongoose');
 
-	mongoose.connection.on('connected', () => {
-		console.log('Connected to MongoDB!');
-	});
+const connectToMongoDB = (mongoUrl) => {
+    mongoose.connect(mongoUrl);
+    mongoose.connection.on('connected', () => console.log('Connected to MongoDB!'));
+    mongoose.connection.on('reconnected', () => console.log('MongoDB reconnected!'));
+    mongoose.connection.on('error', (err) => {
+        console.log(`Error in MongoDb connection: ${err}`);
+        mongoose.disconnect();
+    });
+    mongoose.connection.on('disconnected', () => {
+        console.error(`MongoDB disconnected! Reconnecting in ${30000 / 1000}s...`);
+        setTimeout(() => mongoose.connect(mongoUrl), 30000);
+    });
+};
 
-	mongoose.connection.on('reconnected', () => {
-		console.log('MongoDB reconnected!');
-	});
-
-	mongoose.connection.on('error', (error) => {
-		console.error(`Error in MongoDb connection: ${error}`);
-		mongoose.disconnect();
-	});
-
-	mongoose.connection.on('disconnected', () => {
-		console.error(`MongoDB disconnected! Reconnecting in ${options.reconnectInterval / 1000}s...`);
-		setTimeout(() => connectToMongo(), options.reconnectInterval);
-	});
-
-	return {
-		connectToMongo,
-	};
-}
+module.exports = connectToMongoDB;
